@@ -35,6 +35,7 @@ namespace Treina_Contas.ViewModels
         public Command AnswerParaRomanoCommand => new Command(() => RespondeParaRomano());
 
         public event EventHandler SetFocus;
+        public event EventHandler<string> ShowAlert;
 
         public RomanoViewModel()
         {
@@ -49,12 +50,19 @@ namespace Treina_Contas.ViewModels
 
         private void CriaConta()
         {
-            Numero = random.Next(1, Maximo);
-            Romano = ArabicToRoman(Numero);
+            try
+            {
+                Numero = random.Next(1, Maximo);
+                Romano = ArabicToRoman(Numero);
 
-            Resposta = "";
+                Resposta = "";
 
-            SetFocus?.Invoke(this, EventArgs.Empty);
+                SetFocus?.Invoke(this, EventArgs.Empty);
+            }
+            catch (Exception ex)
+            {
+                ShowAlert?.Invoke(this, $"Deu Erro: {ex.ToString()}");
+            }
         }
 
         // Convert Roman numerals to an integer.
@@ -97,20 +105,34 @@ namespace Treina_Contas.ViewModels
 
         private void RespondeParaRomano()
         {
-            if (Resposta.ToUpper() == Romano)
-                Certas++;
-            else
-                Erradas++;
+            try
+            {
+                if (Resposta.ToUpper() == Romano)
+                    Certas++;
+                else
+                    Erradas++;
+            }
+            catch (Exception ex)
+            {
+                ShowAlert?.Invoke(this, "Não faz besteira, guri!");
+            }
 
             CriaConta();
         }
 
         private void RespondeParaArabico()
         {
-            if (int.Parse("0" + (Resposta ?? "")) == Numero)
-                Certas++;
-            else
-                Erradas++;
+            try
+            {
+                if (int.Parse("0" + (Resposta ?? "")) == Numero)
+                    Certas++;
+                else
+                    Erradas++;
+            }
+            catch (Exception ex)
+            {
+                ShowAlert?.Invoke(this, "Não faz besteira, guri!");
+            }
 
             CriaConta();
         }
